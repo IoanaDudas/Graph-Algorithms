@@ -1,0 +1,60 @@
+
+    def lowestCostWalk(self, start, end, prev):
+        numberEdges = self.getNumberEdges()
+        numberVertices = self.getNumberVertices()
+
+        d = [[math.inf for x in range(numberEdges + 1)] for y in range(numberVertices)]
+        for i in range(numberEdges + 1):
+            d[start][i] = 0
+        last = [0] * numberVertices
+
+        for i in range(numberVertices - 1):
+            changed = False
+            for edge in self.listCosts():
+                if d[edge[1]][last[edge[0]]+1] > d[edge[0]][last[edge[0]]] + self.getCost(edge[0], edge[1]):
+                    newCost = d[edge[0]][last[edge[0]]] + self.getCost(edge[0], edge[1])
+
+                    for j in range(last[edge[0]] + 1, numberEdges + 1):
+                        d[edge[1]][j] = newCost
+                    changed = True
+                    last[edge[1]] = last[edge[0]]+1
+                    prev[edge[1]] = edge[0]
+            if not changed:
+                break
+
+        for edge in self.listCosts():
+            if d[edge[1]][last[edge[0]] + 1] > d[edge[0]][last[edge[0]]] + self.getCost(edge[0], edge[1]):
+                raise Exception("Negative cost!")
+
+        return d[end][numberEdges]
+
+
+    def nrOfLowCostWalks(self, start, end):
+        numberOfVertices = self._numberVetices
+
+        dist = [math.inf] * numberOfVertices
+        dist[start] = 0
+        numberPaths = [0] * numberOfVertices
+        numberPaths[start] = 1
+        prev = [[] for i in range(numberOfVertices)]
+
+        for i in range(numberOfVertices - 1):
+            changed = False
+            for edge in self.listCosts():
+                if dist[edge[1]] > dist[edge[0]] + self.getCost(edge[0], edge[1]):
+                    dist[edge[1]] = dist[edge[0]] + self.getCost(edge[0], edge[1])
+                    numberPaths[edge[1]] = numberPaths[edge[0]]
+                    if edge[0] not in prev[edge[1]]:
+                        prev[edge[1]].append(edge[0])
+                    changed = True
+                elif dist[edge[1]] == dist[edge[0]] + self.getCost(edge[0], edge[1]) and edge[0] not in prev[edge[1]]:
+                    numberPaths[edge[1]] += numberPaths[edge[0]]
+                    prev[edge[1]].append(edge[0])
+                    for p in prev:
+                        if edge[1] in p:
+                            p.remove(edge[1])
+                    changed = True
+            if not changed:
+                break
+
+        return numberPaths[end]

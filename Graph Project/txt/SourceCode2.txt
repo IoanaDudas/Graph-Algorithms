@@ -1,0 +1,72 @@
+
+    def bfsShortestPath(self, start, end):
+        # keeps track of explored vertices
+        explored = []
+        # keeps track of all the paths that will be checked
+        queue = [[start]]
+        # returns path if the start is equal to the end
+        '''if start == end:
+            raise Exception("The start is equal to the end!")'''
+
+        # keeps looping until all possible paths have been checked
+        while queue:
+            # pops the first path from the queue
+            path = queue.pop(0)
+            # gets the last vertex from the path
+            vertex = path[-1]
+            if vertex not in explored:
+                neighbours = self._graphOut[vertex]
+                # goes through all neighbour vertices, constructs a new path and pushes it into the queue
+                for neighbour in neighbours:
+                    newPath = list(path)
+                    newPath.append(neighbour)
+                    queue.append(newPath)
+                    # returns the path if the neighbour is the end
+                    if neighbour == end:
+                        return newPath
+
+                # marks vertex as explored
+                explored.append(vertex)
+
+        # in case there's no path between the 2 vertices
+        raise Exception("Connecting path doesn't exist!")
+
+
+Bonus 1B
+
+     def DF1(self, vertex, visited, stack):
+        for each in self._graphOut[vertex]:
+            if each not in visited:
+                visited.append(each)
+                self.DF1(each, visited, stack)
+        stack.append(vertex)
+
+
+    def KosarajuAlgorithm(self):
+        stack = []
+        visited = []
+
+        for each in range(self._numberVetices):
+            if each not in visited:
+                visited.append(each)
+                self.DF1(each, visited, stack)
+
+        visited.clear()
+        queue = []
+        connectedNumber = 0
+        components = {}
+        while len(stack) != 0:
+            element = stack.pop(-1)
+            if element not in visited:
+                connectedNumber += 1
+                components[connectedNumber] = [element]
+                queue.append(element)
+                visited.append(element)
+                while len(queue) != 0:
+                    vertex = queue.pop(-1)
+                    for each in self._graphIn[vertex]:
+                        if each not in visited:
+                            visited.append(each)
+                            queue.append(each)
+                            components[connectedNumber].append(each)
+        return components

@@ -1,0 +1,41 @@
+
+    def topologicalSortPredecessorCounting(self):
+
+        sortedList = []
+        queue = []
+        count = {}
+        for x in self._graphIn.keys():
+            count[x] = self.inDegree(x)
+            if count[x] == 0:
+                queue.append(x)
+        while len(queue) != 0:
+            x = queue.pop(0)
+            sortedList.append(x)
+            for y in self.outboundEdges(x):
+                count[y] = count[y] - 1
+                if count[y] == 0:
+                    queue.append(y)
+        if len(sortedList) < len(self._graphIn.keys()):
+            sortedList = None
+        return sortedList
+
+
+    def highestCostPath(self, sortedList, start, end):
+
+        vertices = self.getNumberVertices()
+        costList = [-1000000] * vertices
+        costList[start] = 0
+
+        for current in sortedList:
+            if current == end:
+                break
+            for neighbour in self.outboundEdges(current):
+                edgeCost = self.getCost(current, neighbour)
+                if costList[neighbour] < costList[current] + edgeCost:
+                    costList[neighbour] = costList[current] + edgeCost
+
+
+        if costList[end] < 0:
+            print("No cost between the vertices")
+        else:
+            print(costList[end])
